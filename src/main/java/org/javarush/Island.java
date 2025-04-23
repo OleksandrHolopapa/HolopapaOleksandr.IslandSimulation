@@ -1,10 +1,12 @@
 package org.javarush;
 
+import org.javarush.services.TableService;
+
+import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 public class Island {
     private Map<Coordinates, Map<Type, List<Creature>>> gameField;
@@ -13,8 +15,16 @@ public class Island {
     private int height;
     private List<String> initCreaturesStats;
 
+    {
+        try {
+            initCreaturesStats = Files.readAllLines(Path.of("src/main/resources/initialStatsOfCreatures.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    Island(int length, int height){
+
+    Island(int length, int height) {
         this.length = length;
         this.height = height;
     }
@@ -26,6 +36,14 @@ public class Island {
             }
         }
     }
+
+    void read(){
+        String[] strings = TableService.readRowElement(initCreaturesStats, "WOLF");
+        System.out.println(Arrays.toString(strings));
+    }
+
+
+
 
 
 
