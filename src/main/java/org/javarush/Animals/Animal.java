@@ -1,6 +1,5 @@
 package org.javarush.Animals;
 
-import lombok.Setter;
 import org.javarush.Creature;
 import org.javarush.Gender;
 
@@ -21,13 +20,29 @@ public class Animal implements Creature {
         this.maxPopulation = maxPopulation;
         this.maxSpeedOfMovement = maxSpeedOfMovement;
         this.maxCanEat = maxCanEat;
+        gender = chooseGender();
     }
 
     public Gender getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
+    public Gender chooseGender(){
+        return random.nextInt(2)==0? Gender.MALE:Gender.FEMALE;
+    }
+
+    @Override
+    public double getWeight() {
+        return maxWeight;
+    }
+
+    @Override
+    public int getMaxPopulation() {
+        return maxPopulation;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 }
