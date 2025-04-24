@@ -41,6 +41,6 @@ public class Coordinates {
 
         @Override
         public String toString() {
-            return "\nCell "+x+" "+y;
+            return "Cell "+x+":"+y;
         }
 }

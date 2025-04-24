@@ -1,16 +1,17 @@
 package org.javarush;
 
-import java.lang.reflect.Type;
-import java.util.List;
+import org.javarush.Animals.Predators.Wolf;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        Island island = new Island(2,4);
+        Island island = new Island(4,4);
         island.initIsland();
-        Map<Coordinates, Map<Type, List<Creature>>> gameField = island.getGameField();
-
-        //System.out.println(gameField);
-
+        island.showGameField();
+        System.out.println();
+        island.period();
+        island.showGameField();
     }
 }
