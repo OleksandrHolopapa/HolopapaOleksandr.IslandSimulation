@@ -7,9 +7,9 @@ public enum Creatures {
     BEAR,
     EAGLE,
     HORSE,
-    DEER,
+    DEER,*/
     RABBIT,
-    MOUSE,
+    /*MOUSE,
     GOAT,
     SHEEP,
     BOAR,

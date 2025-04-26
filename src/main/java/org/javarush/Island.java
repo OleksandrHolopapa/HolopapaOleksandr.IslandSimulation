@@ -6,13 +6,12 @@ import org.javarush.Animals.Predators.Wolf;
 import org.javarush.Plants.Plant;
 import org.javarush.services.TableService;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 public class Island {
-    private Map<Coordinates, Map<Type, List<Creature>>> gameField;
+    private Map<Coordinates, Map<Class<? extends Creature>, List<Creature>>> gameField;
     private final Random random = new Random();
     private int length;
     private int height;
@@ -41,7 +40,7 @@ public class Island {
         }
     }
 
-    public Map<Coordinates, Map<Type, List<Creature>>> getGameField() {
+    public Map<Coordinates, Map<Class<? extends Creature>, List<Creature>>> getGameField() {
         return gameField;
     }
 
@@ -51,7 +50,7 @@ public class Island {
     }
 
     private Creature creatureFactory(Creatures creature) {
-        String[] creatureInitStats = TableService.readRowElement(initCreaturesStats, creature.toString());
+        String[] creatureInitStats = TableService.getCreatureInitStats(creature.toString());
         double maxWeight = Double.parseDouble(creatureInitStats[1].trim());
         int maxPopulation = Integer.parseInt(creatureInitStats[2].trim());
         int maxSpeedOfMovement = Integer.parseInt(creatureInitStats[3].trim());
@@ -63,9 +62,9 @@ public class Island {
             case BEAR -> new Bear();
             case EAGLE -> new Eagle();
             case HORSE -> new Horse();
-            case DEER -> new Deer();
+            case DEER -> new Deer();*/
             case RABBIT -> new Rabbit(maxWeight, maxPopulation, maxSpeedOfMovement, maxCanEat);
-            case MOUSE -> new Mouse();
+            /*case MOUSE -> new Mouse();
             case GOAT -> new Goat();
             case SHEEP -> new Sheep();
             case BOAR -> new Boar();
@@ -77,8 +76,8 @@ public class Island {
         return islandCreature;
     }
 
-    private Map<Type, List<Creature>> fillCellWithCreatures(){
-        Map<Type, List<Creature>> creaturesInCell = new HashMap<>();
+    private Map<Class<? extends Creature>, List<Creature>> fillCellWithCreatures(){
+        Map<Class<? extends Creature>, List<Creature>> creaturesInCell = new HashMap<>();
         for(Creatures enumValue : Creatures.values()){
             if(creatureIsPresentInCell()){
                 Creature islandCreature = creatureFactory(enumValue);
@@ -103,20 +102,66 @@ public class Island {
     }
 
     void showGameField(){
-        for (Map.Entry<Coordinates, Map<Type, List<Creature>>> entry : gameField.entrySet()) {
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
             System.out.println(entry.getKey());
-            for (Map.Entry<Type, List<Creature>> entryMap : entry.getValue().entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> entryMap : entry.getValue().entrySet()) {
                 System.out.println("\tCreature type "+entryMap.getKey()+" Population = "+entryMap.getValue().size()+". Creatures:");
                 for (Creature creature: entryMap.getValue()) {
                     System.out.println("\t\t"+creature);
+                    if(creature instanceof Animal animal) System.out.println("\t\t"+animal.getGender());
                 }
             }
         }
     }
-
+    //TODO зробити окремі сервіси foodService, reproductionService,  relocationService, initializationService
+    // додати метод die(),
+    // розмноження раз на декілька циклів
     void period(){
-        for (Map.Entry<Coordinates, Map<Type, List<Creature>>> entry : gameField.entrySet()) {
-            for (Map.Entry<Type, List<Creature>> entryMap : entry.getValue().entrySet()) {
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> entryMap : entry.getValue().entrySet()) {
+                for (Creature creature : entryMap.getValue()) {
+                    if(creature instanceof Animal animal) animal.setMoved(false);
+                }
+            }
+        }
+
+        //харчування
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> entryMap : entry.getValue().entrySet()) {
+                for (Creature creature : entryMap.getValue()) {
+                    if(creature instanceof Animal animal) animal.eat(entry.getValue());
+                }
+            }
+        }
+
+        System.out.println("------------------------------AFTER-EATING------------------------------------------");
+        showGameField();
+
+        for (Map<Class<? extends Creature>, List<Creature>> value : gameField.values()) {
+            die(value);
+        }
+
+        //reproduction
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> entryMap : entry.getValue().entrySet()) {
+                if(!entryMap.getValue().isEmpty()){
+                    int numberOfNewCreatures;
+                    if(entryMap.getKey().equals(Plant.class)) numberOfNewCreatures = Plant.reproduction(entryMap.getValue());
+                    else numberOfNewCreatures = Animal.reproduction(entryMap.getValue());
+                    String speciesName = entryMap.getKey().getSimpleName().toUpperCase();
+                    for (int i = 0; i < numberOfNewCreatures; i++) {
+                        entryMap.getValue().add(creatureFactory(Creatures.valueOf(speciesName)));
+                    }
+                }
+            }
+        }
+        System.out.println("------------------------------AFTER-REPRODUCTION------------------------------------");
+        showGameField();
+
+        //тварини мандруватимуть лише після споживання їжі та розмноження
+        //moving
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> entryMap : entry.getValue().entrySet()) {
                 for (int i = 0; i<entryMap.getValue().size(); i++) {
                     Creature creature = entryMap.getValue().get(i);
                     if((creature instanceof Animal animal)&&(!animal.getMoved())) {
@@ -124,26 +169,27 @@ public class Island {
                         if((!destinationCell.equals(entry.getKey()))&&canGoToDestinationCell(destinationCell, animal)) {
                             animal.setMoved(true);
                             moving(entry.getKey(), destinationCell, animal);
-                            System.out.println(animal+" go from "+entry.getKey()+" to "+destinationCell);
+                            System.out.println(animal+" "+animal.getGender()+" go from "+entry.getKey()+" to "+destinationCell);
                             i--;
                         }
                     }
                 }
             }
         }
+        System.out.println("------------------------------AFTER-MOVING------------------------------------------");
     }
 
     boolean canGoToDestinationCell(Coordinates destinationCell, Animal animal){
-        Map<Type, List<Creature>> creaturesInDestinationCell = gameField.get(destinationCell);
+        Map<Class<? extends Creature>, List<Creature>> creaturesInDestinationCell = gameField.get(destinationCell);
         List<Creature> sameAnimalsInDestinationCell = creaturesInDestinationCell.get(animal.getClass());
         return sameAnimalsInDestinationCell==null||sameAnimalsInDestinationCell.size()<animal.getMaxPopulation();
     }
 
     void moving(Coordinates currentCell, Coordinates destinationCell, Animal animal){
-        Map<Type, List<Creature>> creaturesInCurrentCell = gameField.get(currentCell);
+        Map<Class<? extends Creature>, List<Creature>> creaturesInCurrentCell = gameField.get(currentCell);
         List<Creature> sameAnimalsInCurrentCell = creaturesInCurrentCell.get(animal.getClass());
         sameAnimalsInCurrentCell.remove(animal);
-        Map<Type, List<Creature>> creaturesInDestinationCell = gameField.get(destinationCell);
+        Map<Class<? extends Creature>, List<Creature>> creaturesInDestinationCell = gameField.get(destinationCell);
         if(creaturesInDestinationCell.containsKey(animal.getClass())){
             List<Creature> sameAnimalsInDestinationCell = creaturesInDestinationCell.get(animal.getClass());
             sameAnimalsInDestinationCell.add(animal);
@@ -152,6 +198,22 @@ public class Island {
             List<Creature> sameAnimalsInDestinationCell = new ArrayList<>();
             sameAnimalsInDestinationCell.add(animal);
             creaturesInDestinationCell.put(animal.getClass(), sameAnimalsInDestinationCell);
+        }
+    }
+
+    void die(Map<Class<? extends Creature>, List<Creature>> creaturesInCell){
+        for (Map.Entry<Class<? extends Creature>, List<Creature>> entry : creaturesInCell.entrySet()) {
+            if(!entry.getKey().equals(Plant.class)){
+                List<Creature> creatures = entry.getValue();
+                for (int i = 0; i < creatures.size(); i++) {
+                    Creature creature = creatures.get(i);
+                    if(creature.getWeight()<=0) {
+                        System.out.println(creature+" IS DEAD");
+                        creatures.remove(creature);
+                        i--;
+                    }
+                }
+            }
         }
     }
 
