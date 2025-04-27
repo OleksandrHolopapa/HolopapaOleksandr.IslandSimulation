@@ -1,4 +1,4 @@
-package org.javarush;
+package org.javarush.services.factoryService;
 
 public enum Creatures {
     WOLF,

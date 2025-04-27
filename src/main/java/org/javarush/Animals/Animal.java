@@ -1,40 +1,27 @@
 package org.javarush.Animals;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.javarush.Coordinates;
 import org.javarush.Creature;
-import org.javarush.Gender;
 import org.javarush.services.TableService;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class Animal implements Creature {
-    private static List<String> possibilityToEatTable;
-
-    static {
-        try {
-            possibilityToEatTable = Files.readAllLines(Path.of("src/main/resources/eatingPossibilitiesTable.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static final Random random = new Random();
-    private final double maxWeight;
     private double weight;
     private final int maxPopulation;
     private final int maxSpeedOfMovement;
     private final double maxCanEat;
+    @Getter
     private final Gender gender;
+    @Setter
     private boolean moved = false;
 
-    public Animal(double maxWeight, int maxPopulation, int maxSpeedOfMovement, double maxCanEat) {
-        this.maxWeight = maxWeight;
-        weight = maxWeight;
+    public Animal(double weight, int maxPopulation, int maxSpeedOfMovement, double maxCanEat) {
+        this.weight = weight;
         this.maxPopulation = maxPopulation;
         this.maxSpeedOfMovement = maxSpeedOfMovement;
         this.maxCanEat = maxCanEat;
@@ -47,27 +34,26 @@ public class Animal implements Creature {
             int possibilityToEatValue = TableService.getPossibilityToEatValue(this.toString(), simpleName);
             if(possibilityToEatValue>0&&(!entry.getValue().isEmpty())){
                 if(random.nextInt(100)<=possibilityToEatValue){
-                    double creatureWeigh = entry.getValue().getFirst().getWeight();
+                    double creatureWeigh = entry.getValue().getLast().getWeight();
                     entry.getValue().removeLast();
                     this.weight += Math.min(creatureWeigh, this.maxCanEat);
-                    System.out.println(this+" eat "+simpleName);
                 }
                 break;
             }
         }
-        this.weight -= Math.max(maxCanEat, maxWeight*0.5);
+        this.weight -= 1.5*maxCanEat;
     }
 
     public Coordinates move(Coordinates coordinates, int length, int height) {
-        Coordinates pos = new Coordinates(coordinates.getX(), coordinates.getY());
+        Coordinates destination = new Coordinates(coordinates.getX(), coordinates.getY());
         int distance = random.nextInt(maxSpeedOfMovement);
         switch (random.nextInt(4)){
-            case 0 -> pos.setY(Math.max(pos.getY()-distance, 1));
-            case 1 -> pos.setX(Math.min(pos.getX()+distance, length));
-            case 2 -> pos.setY(Math.min(pos.getY()+distance, height));
-            case 3 -> pos.setX(Math.max(pos.getX()-distance, 1));
+            case 0 -> destination.setY(Math.max(destination.getY()-distance, 1));
+            case 1 -> destination.setX(Math.min(destination.getX()+distance, length));
+            case 2 -> destination.setY(Math.min(destination.getY()+distance, height));
+            case 3 -> destination.setX(Math.max(destination.getX()-distance, 1));
         }
-        return pos;
+        return destination;
     }
 
 
@@ -81,10 +67,6 @@ public class Animal implements Creature {
         return Math.min(possibleNumberOfNewCreature, realNumberOfNewCreature);
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
     public Gender chooseGender(){
         return random.nextInt(2)==0? Gender.MALE:Gender.FEMALE;
     }
@@ -93,13 +75,9 @@ public class Animal implements Creature {
         return moved;
     }
 
-    public void setMoved(boolean moved) {
-        this.moved = moved;
-    }
-
     @Override
     public double getWeight() {
-        return maxWeight;
+        return weight;
     }
 
     @Override

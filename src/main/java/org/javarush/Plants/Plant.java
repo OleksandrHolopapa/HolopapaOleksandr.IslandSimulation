@@ -5,16 +5,16 @@ import org.javarush.Creature;
 import java.util.List;
 
 public class Plant implements Creature {
-    private double maxWeight;
-    private int maxPopulation;
+    private final double weight;
+    private final int maxPopulation;
 
-    public Plant(double maxWeight, int maxPopulation) {
-        this.maxWeight = maxWeight;
+    public Plant(double weight, int maxPopulation) {
+        this.weight = weight;
         this.maxPopulation = maxPopulation;
     }
 
     public double getWeight() {
-        return maxWeight;
+        return weight;
     }
 
     @Override
