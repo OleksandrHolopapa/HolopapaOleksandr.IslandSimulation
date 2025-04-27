@@ -1,6 +1,6 @@
 package org.javarush;
 
-import org.javarush.Animals.Animal;
+import org.javarush.Plants.Plant;
 import org.javarush.services.islandServises.FoodService;
 import org.javarush.services.islandServises.InitializationService;
 import org.javarush.services.islandServises.RelocationService;
@@ -13,6 +13,8 @@ public class Island {
     private final int length;
     private final int height;
 
+    private static int timeToReproduction = 3;
+    public boolean stopSimulation;
     Island(int length, int height) {
         this.length = length;
         this.height = height;
@@ -31,12 +33,28 @@ public class Island {
         }
     }
 
-    //TODO розмноження раз на декілька циклів
+    //TODO створити StopSimulationService, закинути timeToReproduction до ReproductionService
     void period(){
+        stopSimulation = true;
         FoodService.timeToEat(gameField);
         FoodService.deathByStarvation(gameField);
-        ReproductionService.reproductionOnTheIsland(gameField);
+        timeToReproduction--;
+        if(timeToReproduction==0){
+            ReproductionService.reproductionOnTheIsland(gameField);
+            System.out.println("------------------------------REPRODUCED");
+            timeToReproduction=3;
+        }
         RelocationService.movingOnTheIsland(gameField, length, height);
-        System.out.println("After relocation-----------------------------------------------------------------------");
+
+        for (Map.Entry<Coordinates, Map<Class<? extends Creature>, List<Creature>>> entry : gameField.entrySet()) {
+            for (Map.Entry<Class<? extends Creature>, List<Creature>> listEntry : entry.getValue().entrySet()) {
+                if(!listEntry.getKey().equals(Plant.class)) {
+                    if(!listEntry.getValue().isEmpty()) stopSimulation = false;
+                }
+            }
+        }
+        if(stopSimulation) {
+            System.out.println("!!!!!!!!!!!!!!!!!Simulation STOPS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
     }
 }

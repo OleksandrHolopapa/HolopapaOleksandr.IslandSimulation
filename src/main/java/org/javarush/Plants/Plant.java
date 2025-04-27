@@ -1,20 +1,18 @@
 package org.javarush.Plants;
 
+import lombok.Getter;
 import org.javarush.Creature;
 
 import java.util.List;
 
 public class Plant implements Creature {
+    @Getter
     private final double weight;
     private final int maxPopulation;
 
     public Plant(double weight, int maxPopulation) {
         this.weight = weight;
         this.maxPopulation = maxPopulation;
-    }
-
-    public double getWeight() {
-        return weight;
     }
 
     @Override

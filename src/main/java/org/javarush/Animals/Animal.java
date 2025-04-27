@@ -41,11 +41,12 @@ public class Animal implements Creature {
                 break;
             }
         }
-        this.weight -= 1.5*maxCanEat;
+        this.weight -= 1.2*maxCanEat;
     }
 
     public Coordinates move(Coordinates coordinates, int length, int height) {
         Coordinates destination = new Coordinates(coordinates.getX(), coordinates.getY());
+        if(maxSpeedOfMovement<=0) return coordinates;
         int distance = random.nextInt(maxSpeedOfMovement);
         switch (random.nextInt(4)){
             case 0 -> destination.setY(Math.max(destination.getY()-distance, 1));

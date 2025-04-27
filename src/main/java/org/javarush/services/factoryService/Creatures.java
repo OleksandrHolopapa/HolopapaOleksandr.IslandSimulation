@@ -2,19 +2,19 @@ package org.javarush.services.factoryService;
 
 public enum Creatures {
     WOLF,
-    /*BOA,
+    BOA,
     FOX,
     BEAR,
     EAGLE,
     HORSE,
-    DEER,*/
+    DEER,
     RABBIT,
-    /*MOUSE,
+    MOUSE,
     GOAT,
     SHEEP,
     BOAR,
     BUFFALO,
     DUCK,
-    CATERPILLAR,*/
+    CATERPILLAR,
     PLANT;
 }
