@@ -3,7 +3,7 @@ package org.javarush.services.islandServises;
 import org.javarush.Animals.Animal;
 import org.javarush.Coordinates;
 import org.javarush.Creature;
-import org.javarush.Plants.Plant;
+import org.javarush.Plants.Grass;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class FoodService {
 
     private static void die(Map<Class<? extends Creature>, List<Creature>> creaturesInCell){
         for (Map.Entry<Class<? extends Creature>, List<Creature>> entry : creaturesInCell.entrySet()) {
-            if(!entry.getKey().equals(Plant.class)){
+            if(!entry.getKey().equals(Grass.class)){
                 List<Creature> creatures = entry.getValue();
                 for (int i = 0; i < creatures.size(); i++) {
                     Animal creature = (Animal) creatures.get(i);
@@ -39,6 +39,4 @@ public class FoodService {
             }
         }
     }
-
-
 }

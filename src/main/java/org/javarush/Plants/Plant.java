@@ -1,13 +1,9 @@
 package org.javarush.Plants;
 
-import lombok.Getter;
 import org.javarush.Creature;
 
-import java.util.List;
-
 public class Plant implements Creature {
-    @Getter
-    private final double weight;
+    private double weight;
     private final int maxPopulation;
 
     public Plant(double weight, int maxPopulation) {
@@ -20,13 +16,12 @@ public class Plant implements Creature {
         return maxPopulation;
     }
 
-    public static int reproduction(List<Creature> creaturesOfTheSameSpecies) {
-        int possibleNumberOfNewCreature = creaturesOfTheSameSpecies.getFirst().getMaxPopulation()-creaturesOfTheSameSpecies.size();
-        return Math.min(creaturesOfTheSameSpecies.size(), possibleNumberOfNewCreature);
+    @Override
+    public double getWeight() {
+        return weight;
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();
+    public void setWeight(double weight) {
+        this.weight = weight>0? weight:0;
     }
 }

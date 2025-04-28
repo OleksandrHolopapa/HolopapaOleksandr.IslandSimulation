@@ -1,4 +1,4 @@
-           |Wolf|Boa|Fox|Bear|Eagle|Horse|Deer|Rabbit|Mouse|Goat|Sheep|Boar|Buffalo|Duck|Caterpillar|Plant
+           |Wolf|Boa|Fox|Bear|Eagle|Horse|Deer|Rabbit|Mouse|Goat|Sheep|Boar|Buffalo|Duck|Caterpillar|Grass
 Wolf       |  0 | 0 | 0 |  0 |   0 |  10 | 15 |   60 |  80 | 60 |  70 | 15 |    10 | 40 |         0 |   0
 Boa        |  0 | 0 |15 |  0 |   0 |   0 |  0 |   20 |  40 |  0 |   0 |  0 |     0 | 10 |         0 |   0
 Fox        |  0 | 0 | 0 |  0 |   0 |   0 |  0 |   70 |  90 |  0 |   0 |  0 |     0 | 60 |        40 |   0

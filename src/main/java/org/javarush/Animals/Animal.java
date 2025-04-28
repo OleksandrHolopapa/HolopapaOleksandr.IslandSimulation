@@ -2,9 +2,12 @@ package org.javarush.Animals;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import org.javarush.Coordinates;
 import org.javarush.Creature;
+import org.javarush.Plants.Grass;
 import org.javarush.services.TableService;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -34,9 +37,14 @@ public class Animal implements Creature {
             int possibilityToEatValue = TableService.getPossibilityToEatValue(this.toString(), simpleName);
             if(possibilityToEatValue>0&&(!entry.getValue().isEmpty())){
                 if(random.nextInt(100)<=possibilityToEatValue){
-                    double creatureWeigh = entry.getValue().getLast().getWeight();
-                    entry.getValue().removeLast();
+                    Creature creature = entry.getValue().getLast();
+                    double creatureWeigh = creature.getWeight();
                     this.weight += Math.min(creatureWeigh, this.maxCanEat);
+                    if(simpleName.equals("Grass")){
+                        Grass grass = (Grass) creature;
+                        grass.setWeight(grass.getWeight()-this.maxCanEat);
+                    }
+                    else {entry.getValue().removeLast();}
                 }
                 break;
             }
@@ -56,7 +64,6 @@ public class Animal implements Creature {
         }
         return destination;
     }
-
 
     public static int reproduction(List<Creature> creaturesOfTheSameSpecies) {
         int maleCount = 0;

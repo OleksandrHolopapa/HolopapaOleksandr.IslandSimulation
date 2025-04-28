@@ -2,6 +2,7 @@ package org.javarush.services.islandServises;
 
 import org.javarush.Coordinates;
 import org.javarush.Creature;
+import org.javarush.Plants.Grass;
 import org.javarush.services.factoryService.CreatureFactoryService;
 import org.javarush.services.factoryService.Creatures;
 
@@ -9,6 +10,7 @@ import java.util.*;
 
 public class InitializationService {
     private static final Random random = new Random();
+
     public static Map<Coordinates, Map<Class<? extends Creature>, List<Creature>>> initIslandGameField(int length, int height){
         Map<Coordinates, Map<Class<? extends Creature>, List<Creature>>> gameField = new HashMap<>();
         for (int i = 1; i <= length; i++) {
@@ -39,8 +41,14 @@ public class InitializationService {
         List<Creature> creatureList = new ArrayList<>();
         creatureList.add(islandCreature);
         int populationOfSameTypeCreatures = getCreaturePopulationInCell(islandCreature.getMaxPopulation());
-        for (int i = 1; i < populationOfSameTypeCreatures; i++) {
-            creatureList.add(CreatureFactoryService.creatureFactory(enumValue));
+        if(islandCreature instanceof Grass grass) {
+            grass.setTotalWeight(populationOfSameTypeCreatures*grass.getWeight());
+            grass.setWeight(populationOfSameTypeCreatures*grass.getWeight());
+        }
+        else {
+            for (int i = 1; i < populationOfSameTypeCreatures; i++) {
+                creatureList.add(CreatureFactoryService.creatureFactory(enumValue));
+            }
         }
         return creatureList;
     }
